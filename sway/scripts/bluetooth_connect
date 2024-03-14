@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Define the MAC address of your Bluetooth headphones
+HEADPHONES_MAC="14:3F:A6:1C:46:BE"
+
+# Check if Bluetooth is currently on
+is_bluetooth_on=$(bluetoothctl show | grep "Powered: yes")
+
+# If Bluetooth is not on, turn it on
+if [ -z "$is_bluetooth_on" ]; then
+    notify-send --icon=/usr/share/icons/Adwaita/scalable/devices/bluetooth.svg "Bluetooth" "Bluetooth is not currently on. Turning it on..."
+    rfkill unblock bluetooth
+    bluetoothctl power on
+    sleep 2  # Give some time for Bluetooth to initialize
+fi
+
+
+
+# Check if the connection was successful
+is_connected=$(bluetoothctl info $HEADPHONES_MAC | grep "Connected: yes")
+
+if [ -z "$is_connected" ]; then
+    # Try to connect to the headphones
+    echo "Connecting to your headphones..."
+    bluetoothctl connect $HEADPHONES_MAC
+    sleep 1
+    is_connected=$(bluetoothctl info $HEADPHONES_MAC | grep "Connected: yes")
+    if [ -z "$is_connected" ]; then
+
+        # Connection failed, send a notification
+        echo "Failed to connect to your headphones."
+        notify-send "Headphones Connection" "Failed to connect to your headphones."
+    fi
+else
+    # Bluetooth is connected, so let's disconnect
+    echo "Bluetooth is connected to your headphones. Disconnecting..."
+    bluetoothctl disconnect $HEADPHONES_MAC
+    sleep 2
+    echo "Turning bluetooth off..."
+    bluetoothctl power off
+fi

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Use slurp to select a region and store the coordinates
+region=$(slurp)
+
+# Take a screenshot using grim and store it in the clipboard
+grim -g "$region" - | wl-copy
+
+# Prompt the user for file name and location
+file_info=$(zenity --file-selection --save --title="Save Screenshot" --confirm-overwrite)
+
+# Check if the user canceled the input
+if [ $? -eq 0 ]; then
+    # Save the screenshot with the specified file name and location
+    grim -g "$region" "$file_info.png"
+fi

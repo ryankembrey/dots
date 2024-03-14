@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Your OpenWeatherMap API key
+API_KEY="e79fb7e72305b2c09d0919e35620afe9"
+
+# Your city name and state code (e.g., "Springwood,NSW,AU")
+LOCATION="Springwood,NSW,AU"
+
+# Function to fetch weather data and send a notification
+fetch_and_notify_weather() {
+    # Fetch the weather data for the specified location
+    weather_data=$(curl -s "https://api.openweathermap.org/data/2.5/weather?q=$LOCATION&appid=$API_KEY&units=metric")
+
+    # Check if the API request was successful
+    if [ $? -ne 0 ]; then
+        notify-send "Weather Error" "Failed to fetch weather data. Please check your network connection or API key."
+        exit 1
+    fi
+
+    # Parse the data for weather details
+    description=$(echo "$weather_data" | jq -r '.weather[0].description')
+    temperature=$(echo "$weather_data" | jq -r '.main.temp')
+    humidity=$(echo "$weather_data" | jq -r '.main.humidity')
+    wind_speed=$(echo "$weather_data" | jq -r '.wind.speed')
+    sunrise=$(echo "$weather_data" | jq -r '.sys.sunrise')
+    sunset=$(echo "$weather_data" | jq -r '.sys.sunset')
+    cloudiness=$(echo "$weather_data" | jq -r '.clouds.all')
+
+    # Send a notification with the weather information
+    notify-send --icon=/usr/share/icons/Adwaita/scalable/devices/weather.svg "Weather Report" "Location: Springwood, NSW
+    Current Weather: $description
+    Temperature: ${temperature}°C
+    Humidity: ${humidity}%
+    Wind Speed: ${wind_speed} m/s
+    Sunrise: $(date -d "@$sunrise" +%T)
+    Sunset: $(date -d "@$sunset" +%T)
+    Cloudiness: ${cloudiness}%"
+}
+
+# Call the function to fetch and notify weather
+fetch_and_notify_weather
