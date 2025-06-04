@@ -7,8 +7,6 @@ call plug#begin()
     Plug 'hrsh7th/cmp-path'
     Plug 'hrsh7th/cmp-cmdline'
     Plug 'hrsh7th/nvim-cmp'
-    Plug 'williamboman/mason.nvim'
-    Plug 'williamboman/mason-lspconfig.nvim'
     Plug 'neovim/nvim-lspconfig'
     Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
     Plug 'nvim-lualine/lualine.nvim'
@@ -23,10 +21,15 @@ call plug#begin()
     Plug 'nvim-lua/plenary.nvim'
     Plug 'folke/todo-comments.nvim'
     Plug 'salkin-mada/openscad.nvim'
+    Plug 'mason-org/mason.nvim'
     Plug 'rose-pine/neovim'
+    Plug 'quarto-dev/quarto-nvim'
+    Plug 'jmbuhr/otter.nvim'
+    Plug 'nvim-telescope/telescope.nvim'
+    Plug 'nvim-telescope/telescope-file-browser.nvim'
+    Plug 'startup-nvim/startup.nvim'    
+    Plug 'norcalli/nvim-colorizer.lua'
 call plug#end()
-
-" colorscheme duskfox
 
 set nocompatible            " disable compatibility to old-time vi
 set showmatch               " show matching
@@ -50,8 +53,11 @@ set clipboard=unnamedplus   " using system clipboard
 filetype plugin on
 " set cursorline              " highlight current cursorline
 set ttyfast                 " Speed up scrolling in Vim
-set spell                 " enable spell check (may need to download language package)
-set noswapfile            " disable creating swap file
+set spell                   " enable spell check (may need to download language package)
+set noswapfile              " disable creating swap file
+set breakindent
+
+
 " set backupdir=~/.cache/vim " Directory to store backup files.
 inoremap jk <Esc>
 let mapleader=" "
@@ -73,8 +79,36 @@ nnoremap <buffer> <leader>ap <cmd>ArduinoChooseProgrammer<CR>
 " Save the document
 nnoremap <leader>s <cmd>w<CR>
 
-" Compile the document with pdflatex
-nnoremap <leader>c :!pdflatex -shell-escape %<CR>
+
+
+
+augroup compile_mapping
+  autocmd!
+  autocmd FileType tex nnoremap <buffer> <leader>c :!pdflatex -shell-escape % && texcount %<CR>
+  autocmd FileType python nnoremap <buffer> <leader>c :!python %<CR>
+augroup END
+
+
+
+
+
+
+
+" " Define a function to handle the conditional save and run behavior
+" function! SaveAndRun()
+"   if &filetype == 'python' && search('from build123d import *', 'nw')
+"     execute 'silent !pkill -f ~/.config/nvim/scripts/auto_py.sh'
+"     execute 'silent !~/.config/nvim/scripts/auto_py.sh ' . expand('%:p') . ' &'
+"   endif
+"   write  " Save the file
+" endfunction
+
+
+
+
+" Map <leader>s to call the function SaveAndRun()
+" nnoremap <leader>s :call SaveAndRun()<CR>
+
 
 " Run BibTeX
 nnoremap <leader>b :!bibtex %:r<CR>
@@ -82,11 +116,14 @@ nnoremap <leader>b :!bibtex %:r<CR>
 
 
 " Autocommands
-autocmd BufWritePre *.py Neoformat
+autocmd BufWritePre *.py Neoformat black
 autocmd BufWritePre *.tex Neoformat
 autocmd BufWritePre *.rs Neoformat
 autocmd BufWritePost *.java :!java-format % | w
+" autocmd BufWritePre *.java Neoformat clangformat
 autocmd BufWritePre *.c keepjumps %!clang-format --style="{IndentWidth: 4}"
+autocmd BufWritePre *.h keepjumps %!clang-format --style="{IndentWidth: 4}"
+autocmd BufNewFile,BufRead *.h set filetype=c
 
 let g:neoformat_try_node_exe = 1
 " let g:neoformat_run_all_formatters = 1
@@ -177,7 +214,7 @@ vim.cmd("colorscheme rose-pine-main")
 require('Comment').setup()
 require("nvim-autopairs").setup {}
 require("mason").setup()
-require("mason-lspconfig").setup()
+-- require("mason-lspconfig").setup()
   -- Set up nvim-cmp.
   local cmp = require'cmp'
 
@@ -259,6 +296,9 @@ require("mason-lspconfig").setup()
     require('lspconfig')["clangd"].setup {
         capabilities = capabilities
     }
+    require('lspconfig')["pylyzer"].setup {
+        capabilities = capabilities
+    }
     require('lspconfig')['rust_analyzer'].setup {
         capabilities = capabilities,
         settings = {
@@ -332,6 +372,50 @@ require("todo-comments").setup {}
 
 vim.g.openscad_auto_open = false
 
+-- Now, add the setup for startup.nvim explicitly here
+require("startup").setup({
+  -- Example: Use a pre-defined theme
+  theme = "dashboard",
+
+  -- Or, uncomment and customize with your sections and options as desired:
+  -- section_1 = {
+  --   type = "text",
+  --   align = "center",
+  --   content = {
+  --     "Welcome to Neovim!",
+  --     "",
+  --     "Start coding or open a file."
+  --   },
+  --   highlight = "String",
+  -- },
+  -- section_2 = {
+  --   type = "mapping",
+  --   align = "center",
+  --   title = "Quick Actions",
+  --   content = {
+  --     {"󰈙 Find File", "Telescope find_files", "<leader>ff" },
+  --     {" Recent Files", "Telescope oldfiles", "<leader>fo" },
+  --     {" File Browser", "Telescope file_browser", "<leader>fb" },
+  --     {" Quit Neovim", "qa", "<leader>qq" },
+  --   }
+  -- },
+  -- options = {
+  --   mapping_keys = true,
+  --   cursor_column = 0.5,
+  --   disable_statuslines = true,
+  --   paddings = {1, 1}, -- Adjust if you uncomment more sections
+  -- },
+  -- parts = {"section_1", "section_2"}, -- Adjust if you uncomment more sections
+})
+
+-- Example of creating custom mappings for startup.nvim help (keep this if you want these mappings)
+require("startup").create_mappings({
+  ["<leader>ff"]="<cmd>Telescope find_files<CR>",
+  ["<leader>lg"]="<cmd>Telescope live_grep<CR>",
+  ["<leader>fb"]="<cmd>Telescope file_browser<CR>",
+})
+
+require'colorizer'.setup()
 
 EOF
 

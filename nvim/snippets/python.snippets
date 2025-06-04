@@ -101,3 +101,36 @@ snippet getsoup
     	return BeautifulSoup(result.text, "html.parser")
 	
 	$0
+snippet ?ib123d
+	from build123d import *
+snippet ?bp 
+	with BuildPart() as ${1:PART_NAME}:
+		$0
+snippet ?bs 
+	with BuildSketch() as ${1:SKETCH_NAME}:
+		$0
+snippet ?bl 
+	with BuildLine() as ${1:LINE_NAME}:
+		$0
+snippet ?line 
+	l_${1:1} = Line(($2,$3), ($4,$5))
+	$0
+snippet ?ttt
+	# Too Tall Toby $1
+	
+	from build123d import *
+
+	densa = 7800 / 1e6  # carbon steel density g/mm^3
+	densb = 2700 / 1e6  # aluminum alloy
+	densc = 1020 / 1e6  # ABS
+
+	with BuildPart() as p:
+		with BuildSketch() as s1:
+			$2
+	
+
+	export_step(p.part, "./models/$1.step")
+	print(f"Part mass = {p.part.volume*densc:0.2f}")
+snippet ?ext 
+	extrude(amount=$1)
+	$0 

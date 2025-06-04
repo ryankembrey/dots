@@ -1,9 +1,10 @@
 {
     "height": 30,
+    "reload_style_on_change": true,
     "spacing": 4,
-    "modules-left": ["sway/workspaces", "sway/mode", "sway/scratchpad", "custom/media"],
+    "modules-left": ["sway/workspaces", "sway/mode", "sway/scratchpad","custom/media"],
     "modules-center": ["clock"],
-    "modules-right": ["pulseaudio", "custom/network", "backlight", "keyboard-state","temperature", "bluetooth", "upower", "power-off"],
+    "modules-right": ["pulseaudio", "custom/network", "backlight", "temperature", "bluetooth", "upower"],
     "keyboard-state": {
         "numlock": true,
         "capslock": true,
@@ -36,14 +37,15 @@
     },
     "battery": {
         "states": {
-            "warning": 30,
-            "critical": 15
+            "warning": 15,
+            "critical": 30
         },
         "format": "{capacity}% {icon}",
         "format-charging": "{capacity}% ",
         "format-plugged": "{capacity}% ",
         "format-alt": "{time} {icon}",
-        "format-icons": ["", "", "", "", ""]
+        "format-icons": ["", "", "", "", ""],
+        "format-critical": "{capacity}% LOW",
     },
     "pulseaudio": {
         "format": "{volume}% {icon}",
@@ -62,17 +64,25 @@
         "scroll-step": 1,
         "on-click": "pavucontrol"
     },
+
     "custom/media": {
-        "format": "{icon} {}",
-        "return-type": "json",
-        "max-length": 40,
-        "format-icons": {
-            "spotify": "",
-            "default": "🎜"
-        },
+        "format": "{}",
         "escape": true,
-        "exec": "$HOME/.config/waybar/mediaplayer.py 2> /dev/null"
+        "return-type": "json",
+        "exec": "/bin/bash ~/.config/waybar/mediaplayer.sh",
+        "on-click": "playerctl play-pause",
+        "on-click-right": "playerctl stop",
+        "on-scroll-up": "playerctl next",
+        "on-scroll-down": "playerctl previous",
+        "smooth-scrolling-threshold": 5,
+        "max-length": 40,
+        "signal": 10,  // Ensures Waybar gets updated when new data is output
+        "background": "{{background-image}}"
     },
+    "custom/art": {
+        "format": ".",
+    },
+
     "bluetooth": {
         "format": " {status}",
         "format-disabled": "",
@@ -95,10 +105,10 @@
     },
 
     "custom/network": {
-    "exec": "sh ~/.config/waybar/scripts/network_status.sh",
-    "interval": 10,
-    "return-type": "json",
-    "on-click": "exec nm-connection-editor"
+        "exec": "sh ~/.config/waybar/scripts/network_status.sh",
+        "interval": 10,
+        "return-type": "json",
+        "on-click": "exec nm-connection-editor"
     },
     
     "temperature": {
@@ -107,5 +117,11 @@
 	    "critical-threshold": 55,
 	    "format-critical": "{temperatureC}°C ",
 	    "format": "{temperatureC}°C "
+    },
+    "custom/cpufreq": {
+        "format": "Turbo",
+        "return-type": "json",
+        "on-click": "sh ~/.config/waybar/scripts/cpu_mode.sh",
     }
+
 }

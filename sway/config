@@ -30,32 +30,36 @@ set $term foot
 exec swaync
 bindsym $mod+Shift+n exec swaync-client -t -sw
 
+for_window [title="Webcam Overlay"] floating enable, move position 80% 80%
+
+
 # Shell Scripts
-set $menu exec wofi --show drun
-bindsym Alt+c exec ~/.config/wofi/scripts/configs.sh
-bindsym Alt+p exec ~/.config/wofi/scripts/wofi_power.sh
-bindsym Alt+b exec ~/.config/wofi/scripts/bookmarks.sh
-bindsym Alt+s exec ~/.config/wofi/scripts/my_scripts.sh
+set $menu exec tofi-drun --drun-launch=true
+bindsym Alt+c exec ~/.config/tofi/scripts/configs.sh
+bindsym Alt+p exec wlogout
+bindsym Alt+b exec ~/.config/tofi/scripts/bookmarks.sh
+bindsym Alt+s exec ~/.config/tofi/scripts/my_scripts.sh
 bindsym Alt+w exec ~/scripts/open_weather.sh
-bindsym Alt+u exec ~/.config/wofi/scripts/quick_assignments.sh
+bindsym Alt+u exec ~/.config/tofi/scripts/quick_assignments.sh
 bindsym Ctrl+Shift+b exec ~/.config/sway/scripts/bluetooth_connect
 bindsym Ctrl+Alt+w exec ~/.config/sway/scripts/weather
 # Keyboard shortcut for pasting in johndoe@gmail.com
-bindsym Alt+e exec wl-copy ryan.kembrey@student.uts.edu.au | wl-paste
+bindsym Alt+e exec wl-copy ryan.kembrey@student.uts.edu.au
 bindsym Alt+r exec echo 'gcc -Wall -Werror -ansi -o helloworld.out helloworld.c -lm' | wl-copy
-bindsym Alt+l exec ~/.config/wofi/scripts/swedish_chars.sh
+bindsym Alt+l exec ~/.config/tofi/scripts/swedish_chars.sh
+bindsym $mod+c exec ~/misc/apps/FreeCAD.AppImage
 
 bindsym Alt+f exec $term yazi
-bindsym $mod+m exec mailsync
+bindsym $mod+m exec mpv ~/music/library/*/*/*.mp3 --shuffle --no-audio-display
 
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-output * bg ~/pictures/wallpapers/nord_valley.png fill
+output * bg ~/pictures/wallpapers/mountains_vig_dark.png fill
 #
 # Example configuration:
 #
-#output HDMI1 pos 1 1 
+output HDMI1 position 0 0
 #output eDP1 pos 0 0
 # You can get the names of your outputs by running: swaymsg -t get_outputs
 gaps inner 4
@@ -63,7 +67,7 @@ gaps outer 2
 
 default_border none
 default_floating_border none
-font pango:monospace 0
+font pango:monospace 12
 #titlebar_padding 1
 # titlebar_border_thickness 0
 
@@ -96,13 +100,18 @@ bindsym $mod+Shift+s exec grim -g "$(slurp)"
 #
 # Example configuration:
 #
-   input "2:14:SynPS/2_Synaptics_TouchPad" {
-       dwt enabled
+#   input "2:14:SynPS/2_Synaptics_TouchPad" {
+#       dwt enabled
 #       tap enabled
-       natural_scroll enabled
-       middle_emulation enabled
-   }
+#       natural_scroll enabled
+#       middle_emulation enabled
+#   }
 #
+input "type:touchpad" {
+    tap disabled
+    natural_scroll disabled
+}
+
 # You can get the names of your inputs by running: swaymsg -t get_inputs
 # Read `man 5 sway-input` for more information about this section.
 
@@ -124,7 +133,7 @@ bindsym $mod+Shift+s exec grim -g "$(slurp)"
     # Despite the name, also works for non-floating windows.
     # Change normal to inverse to use left mouse button for resizing and right
     # mouse button for dragging.
-    floating_modifier $mod normal
+    #floating_modifier $mod normal
 
     # Reload the configuration file
     bindsym $mod+Shift+c reload

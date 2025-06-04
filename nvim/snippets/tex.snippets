@@ -142,3 +142,10 @@ snippet titlepage
       	\end{center}
 	\end{titlepage}
 	$0
+snippet code
+	\begin{listing}[htbp!]
+		\begin{minted}[bgcolor=LightGray, linenos=true]{${1:python}}
+            ${2:CODE}
+		\end{minted}
+		\caption{${3:CAPTION}
+	\end{listing}
